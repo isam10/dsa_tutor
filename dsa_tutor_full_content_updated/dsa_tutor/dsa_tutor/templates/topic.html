@@ -1,0 +1,69 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Module {{ module.id }}: {{ topic_title }}</h2>
+    <div class="topic-content">
+        {{ topic_content | safe }}
+    </div>
+
+    {% if not is_completed %}
+        <button id="mark-complete-btn" data-module-id="{{ module.id }}" data-topic-name="{{ topic_title }}">Mark as Complete</button>
+    {% else %}
+        <p class="completed-message">This topic is already marked as complete!</p>
+    {% endif %}
+
+    <script>
+        document.getElementById("mark-complete-btn").addEventListener("click", function() {
+            const moduleId = this.dataset.moduleId;
+            const topicName = this.dataset.topicName;
+
+            fetch("/mark_complete", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ module_id: moduleId, topic_name: topicName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred while marking the topic as complete.");
+            });
+        });
+    </script>
+
+    <style>
+        .topic-content {
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+        
+        .topic-content p {
+            margin-bottom: 15px;
+        }
+        
+        .topic-content b {
+            font-weight: bold;
+        }
+        
+        .topic-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .topic-content li {
+            margin-bottom: 5px;
+        }
+    </style>
+{% endblock %}
+
+

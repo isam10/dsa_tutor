@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>DSA Problem Solver Agent</h2>
+    <p>Ask the agent any Data Structures and Algorithms question, and it will provide detailed explanations and solutions.</p>
+
+    <div id="chat-container">
+        <div id="chat-messages"></div>
+        <div id="input-container">
+            <textarea id="user-query" rows="3" cols="50" placeholder="Enter your DSA problem or question here..."></textarea>
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("send-btn").addEventListener("click", function() {
+            const query = document.getElementById("user-query").value;
+            if (!query.trim()) return;
+
+            // Add user message to chat
+            addMessage("user", query);
+            
+            // Clear input
+            document.getElementById("user-query").value = "";
+
+            // Send request to agent
+            fetch("/ask_agent", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ query: query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.response) {
+                    addMessage("agent", data.response);
+                } else {
+                    addMessage("agent", "Sorry, I couldn't process your request.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                addMessage("agent", "An error occurred while processing your request.");
+            });
+        });
+
+        function addMessage(sender, message) {
+            const chatMessages = document.getElementById("chat-messages");
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'DSA Agent'}:</strong> ${message}`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Allow Enter key to send message
+        document.getElementById("user-query").addEventListener("keypress", function(e) {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById("send-btn").click();
+            }
+        });
+    </script>
+
+    <style>
+        #chat-container {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            max-width: 800px;
+            margin: 20px 0;
+        }
+        
+        #chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        
+        .user-message {
+            background-color: #e3f2fd;
+            text-align: right;
+        }
+        
+        .agent-message {
+            background-color: #f1f8e9;
+            text-align: left;
+        }
+        
+        #input-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #user-query {
+            flex: 1;
+            resize: vertical;
+        }
+        
+        #send-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        #send-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+{% endblock %}
+
+
