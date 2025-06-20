@@ -1,4 +1,5 @@
-# 🧠 DSA Tutor – Personalized Learning with AI
+# 🧠 DSA Tutor – Personalized Learning with AI 
+(basic still working on it)
 
 > An AI-powered web app that guides users through Data Structures & Algorithms from basics to advanced, offering customized learning paths, progress tracking, and interactive support.
 
